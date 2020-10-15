@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  bikerental-mysql:
+    image: mysql:8.0.21
+    environment:
+      MYSQL_ROOT_PASSWORD: bikerentaldbpwd
+      MYSQL_DATABASE: bikerentaldb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: temp1234
+    ports:
+      - "3306:3306"
+    network_mode: host
+
+  bikerental-service:
+    image: bikerental-image:latest
+    restart: on-failure
+    depends_on:
+      - bikerental-mysql
+    ports:
+    - 8080:8080
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/bikerentaldb?autoReconnect=false&useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: temp1234
+    network_mode: host

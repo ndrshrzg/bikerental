@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'org.ndrshrzg'
-version = '0.0.1-SNAPSHOT'
+version = '0.1'
 sourceCompatibility = '11'
 
 repositories {
@@ -13,21 +13,27 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    // spring web
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    // spring data and mysql driver
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'mysql:mysql-connector-java'
+    // spring security
     implementation 'org.springframework.boot:spring-boot-starter-security'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    runtimeOnly 'com.h2database:h2'
-
     // spring session
-//    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.session:spring-session-core'
     implementation 'org.springframework.session:spring-session-jdbc'
 
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
+    // test dependencies
+    testRuntimeOnly 'com.h2database:h2'
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
+}
+
+build {
 }
 
 test {
