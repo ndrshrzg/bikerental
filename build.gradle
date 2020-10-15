@@ -26,6 +26,9 @@ dependencies {
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
+    // dev
+    runtimeOnly 'com.h2database:h2'
+
     // test dependencies
     testRuntimeOnly 'com.h2database:h2'
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
@@ -38,4 +41,7 @@ build {
 
 test {
     useJUnitPlatform()
+    afterTest { desc, result ->
+        logger.quiet "Executing test ${desc.name} [${desc.className}] with result: ${result.resultType}"
+    }
 }
