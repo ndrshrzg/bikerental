@@ -1,15 +1,14 @@
 package org.ndrshrzg.bikerental.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
+@Table(name="Bikes")
 public class Bike {
 
     private @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long bikeId;
     private String frame;
     private boolean free;
