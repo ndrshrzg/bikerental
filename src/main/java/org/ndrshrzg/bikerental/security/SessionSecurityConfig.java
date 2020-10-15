@@ -32,7 +32,6 @@ public class SessionSecurityConfig extends WebSecurityConfigurerAdapter {
                 .httpBasic()
                 .and()
                 .authorizeRequests()
-                // todo allow acces to /h2-console endpoint
                 // restrict access to other endpoints
                 .antMatchers("/bikes")
                 .hasRole(USERROLE)
