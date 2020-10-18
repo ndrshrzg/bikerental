@@ -4,18 +4,20 @@ import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
-@Table(name="Users")
+@Table(name = "Users")
 public class User {
 
-    private @Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
+
     private String name;
     private float latitude;
     private float longitude;
     private boolean rented;
 
-    public User(){}
+    public User() {
+    }
 
     public User(String name, float latitude, float longitude, boolean rented) {
         this.name = name;

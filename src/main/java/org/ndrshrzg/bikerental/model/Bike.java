@@ -4,13 +4,16 @@ import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
-@Table(name="Bikes")
+@Table(name = "Bikes")
 public class Bike {
 
-    private @Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long bikeId;
+    private Long bikeId;
+
     private String frame;
+    private float latitude;
+    private float longitude;
     private boolean free;
 
     public Bike(String frame, boolean free) {
@@ -43,6 +46,22 @@ public class Bike {
 
     public void setFree(boolean free) {
         this.free = free;
+    }
+
+    public float getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(float latitude) {
+        this.latitude = latitude;
+    }
+
+    public float getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(float longitude) {
+        this.longitude = longitude;
     }
 
     @Override
