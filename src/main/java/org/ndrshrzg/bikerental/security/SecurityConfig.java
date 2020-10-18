@@ -1,5 +1,7 @@
 package org.ndrshrzg.bikerental.security;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,7 +14,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @EnableWebSecurity
-public class SessionSecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
 
     private static final String USERROLE = "USER";
 
@@ -20,7 +24,7 @@ public class SessionSecurityConfig extends WebSecurityConfigurerAdapter {
     public void configureGlobalAuth(AuthenticationManagerBuilder authBuilder) throws Exception {
         authBuilder
                 .inMemoryAuthentication()
-                .withUser("User1")
+                .withUser("Hans")
                 .password(passwordEncoder()
                         .encode("temp1234!")
                 ).roles(USERROLE);
@@ -28,14 +32,13 @@ public class SessionSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity
-                .httpBasic()
-                .and()
+
+        httpSecurity.csrf().disable() // needs to be disabled for POST requests to work
+                .antMatcher("/**")
                 .authorizeRequests()
-                // restrict access to other endpoints
-                .antMatchers("/bikes")
-                .hasRole(USERROLE)
-                .anyRequest().authenticated();
+                .anyRequest().hasRole(USERROLE)
+                .and()
+                .httpBasic();
     }
 
 
