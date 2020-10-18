@@ -20,9 +20,6 @@ dependencies {
     implementation 'mysql:mysql-connector-java'
     // spring security
     implementation 'org.springframework.boot:spring-boot-starter-security'
-    // spring session
-    implementation 'org.springframework.session:spring-session-core'
-    implementation 'org.springframework.session:spring-session-jdbc'
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
