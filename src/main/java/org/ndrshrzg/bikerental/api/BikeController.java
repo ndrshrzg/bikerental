@@ -88,7 +88,6 @@ public class BikeController {
 
         // User already has an active rental session
         if (userHasActiveSession(user.getId())) {
-            // todo change to User.rented field value
             throw new UserHasActiveSessionException(user.getId());
         }
         // User trying to rent a bike that is not free
@@ -179,22 +178,6 @@ public class BikeController {
     private boolean userHasActiveSession(Long userId) {
 
         return userRepository.getRentedById(userId);
-//
-//        Session session = sessionRepository.findByUserId(userId);
-//        // no session for the user was found
-//        if (session == null) {
-//            logger.info("No session found.");
-//            return false;
-//        } else {
-//            // only finished session was found
-//            if (!(session.getSessionEnd() == null)) {
-//                logger.info("User has no active session.");
-//                return false;
-//            } else {
-//                logger.info("User has active session " + session.getSessionId());
-//                return true;
-//            }
-//        }
 
     }
 
