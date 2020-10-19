@@ -16,8 +16,10 @@ public class Bike {
     private float longitude;
     private boolean free;
 
-    public Bike(String frame, boolean free) {
+    public Bike(String frame, float latitude, float longitude, boolean free) {
         this.frame = frame;
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.free = free;
     }
 

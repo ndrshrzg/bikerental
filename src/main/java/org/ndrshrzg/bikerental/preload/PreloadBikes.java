@@ -14,11 +14,11 @@ public class PreloadBikes {
     private static final Logger logger = LoggerFactory.getLogger(PreloadBikes.class);
 
     @Bean
-    CommandLineRunner initBikes(BikeRepository repository){
+    CommandLineRunner initBikes(BikeRepository repository) {
         return args -> {
-            logger.info("Adding Bike: " + repository.save(new Bike("Wilier Cento1Air", true)));
-            logger.info("Adding Bike: " + repository.save(new Bike("Specialized Tarmac SL7", true)));
-            logger.info("Adding Bike: " + repository.save(new Bike("Colnago C63", false)));
+            logger.info("Adding Bike: " + repository.save(new Bike("Wilier Cento1Air", 0.1f, 0.2f, true)));
+            logger.info("Adding Bike: " + repository.save(new Bike("Specialized Tarmac SL7", 0.1f, 0.2f, true)));
+            logger.info("Adding Bike: " + repository.save(new Bike("Colnago C63", 0.1f, 0.2f, true)));
         };
     }
 
