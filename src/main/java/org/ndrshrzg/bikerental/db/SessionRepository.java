@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface SessionRepository extends JpaRepository<Session, Long> {
 
-    Session findByUserId(Long userId);
+    Session findByUserIdAndSessionEndIsNull(Long userId);
 
     @Modifying(clearAutomatically = true)
     @Transactional

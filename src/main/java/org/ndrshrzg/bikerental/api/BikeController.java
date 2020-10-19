@@ -126,7 +126,7 @@ public class BikeController {
         if (!userHasActiveSession(user.getId())) {
             throw new UserHasNoActiveSessionException(user.getId());
         } else {
-            Session activeSession = sessionRepository.findByUserId(user.getId());
+            Session activeSession = sessionRepository.findByUserIdAndSessionEndIsNull(user.getId());
             Long sessionBikeId = activeSession.getBikeId();
             // User trying to return a bike they did not rent
             if (!sessionBikeId.equals(bikeId)) {
