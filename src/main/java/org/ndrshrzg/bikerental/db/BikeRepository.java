@@ -10,10 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface BikeRepository extends JpaRepository<Bike, Long> {
 
-
     @Modifying(clearAutomatically = true)
     @Transactional
-    @Query("update Bike b set b.free = false where b.bikeId = :bikeId")
-    void setBikeFreeToFalse(@Param("bikeId") Long bikeId);
+    @Query("update Bike b set b.free = :isFree where b.bikeId = :bikeId")
+    void setBikeIsFree(@Param("bikeId") Long bikeId, @Param("isFree") boolean isFree);
 
 }

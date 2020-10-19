@@ -1,9 +1,7 @@
 package org.ndrshrzg.bikerental.api;
 
-import org.ndrshrzg.bikerental.ex.BikeAlreadyRentedException;
-import org.ndrshrzg.bikerental.ex.BikeNotFoundException;
-import org.ndrshrzg.bikerental.ex.MethodNotImplementedException;
-import org.ndrshrzg.bikerental.ex.UserHasActiveSessionException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import org.ndrshrzg.bikerental.ex.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -12,6 +10,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ControllerAdvice
 public class CustomExceptionHandler {
+
+    // todo implement an ErrorResponseBuilder class that turns these RuntimeExceptions into nice JSON Errors as specified
+
+    // client errors
 
     @ResponseBody
     @ExceptionHandler(BikeNotFoundException.class)
@@ -28,6 +30,20 @@ public class CustomExceptionHandler {
     }
 
     @ResponseBody
+    @ExceptionHandler(BikeNotRentedException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    String bikeNotRentedHandler(BikeNotRentedException ex) {
+        return ex.getMessage();
+    }
+
+    @ResponseBody
+    @ExceptionHandler(BikeNotRentedByUserException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    String bikeNotRentedByUserHandler(BikeNotRentedByUserException ex) {
+        return ex.getMessage();
+    }
+
+    @ResponseBody
     @ExceptionHandler(UserHasActiveSessionException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     String userHasActiveSessionHandler(UserHasActiveSessionException ex) {
@@ -35,10 +51,26 @@ public class CustomExceptionHandler {
     }
 
     @ResponseBody
+    @ExceptionHandler(UserHasNoActiveSessionException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    String userHasNoActiveSessionHandler(UserHasNoActiveSessionException ex) {
+        return ex.getMessage();
+    }
+
+    // server side errors
+
+    @ResponseBody
     @ExceptionHandler(MethodNotImplementedException.class)
     @ResponseStatus(HttpStatus.NOT_IMPLEMENTED)
     String methodNotImplementedHandler(MethodNotImplementedException ex) {
         return ex.getMessage();
+    }
+
+    @ResponseBody
+    @ExceptionHandler(JsonProcessingException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    String jsonProcessingExceptionHandler() {
+        return "A problem mapping data to JSON occurred.";
     }
 
 
