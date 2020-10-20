@@ -1,15 +1,20 @@
+// build docker image task type
+import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
+
 plugins {
     id 'org.springframework.boot' version '2.3.4.RELEASE'
     id 'io.spring.dependency-management' version '1.0.10.RELEASE'
+    id 'com.avast.gradle.docker-compose' version '0.13.4'
+    id 'com.bmuschko.docker-remote-api' version '6.6.1'
     id 'java'
 }
 
 group = 'org.ndrshrzg'
-version = '0.1'
+version = '1.0'
 sourceCompatibility = '11'
 
 repositories {
-    mavenCentral()
+    jcenter()
 }
 
 dependencies {
@@ -23,7 +28,7 @@ dependencies {
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
-    // dev
+    // in memory db for unit tests
     runtimeOnly 'com.h2database:h2'
 
     // test dependencies
@@ -41,4 +46,23 @@ test {
     afterTest { desc, result ->
         logger.quiet "Executing test ${desc.name} [${desc.className}] with result: ${result.resultType}"
     }
+}
+
+// build docker image. Tag as used in docker-compose.yml
+task buildBikerentalImage(type: DockerBuildImage) {
+    inputDir = file('.')
+    images.add('bikerental-image:latest')
+}
+
+// specify docker-compose file
+dockerCompose {
+    useComposeFiles["docker-compose.yml"]
+}
+
+// custom task that builds java sources, docker image for Bikerental application and runs docker-compose
+task runBikeRental {
+    println("Executing tasks build, buildBikerentalImage and docker-compose up.")
+    dependsOn('build')
+    dependsOn('buildBikerentalImage')
+    dependsOn('composeUp')
 }
