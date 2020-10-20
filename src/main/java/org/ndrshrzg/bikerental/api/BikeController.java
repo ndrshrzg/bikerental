@@ -36,9 +36,9 @@ public class BikeController {
     /**
      * Constructor to instantiate JpaRepository Beans.
      *
-     * @param bikeRepository JpaRepository handling Bikes
+     * @param bikeRepository    JpaRepository handling Bikes
      * @param sessionRepository JpaRepository handling Bikes
-     * @param userRepository JpaRepository handling Bikes
+     * @param userRepository    JpaRepository handling Bikes
      */
     BikeController(BikeRepository bikeRepository, SessionRepository sessionRepository, UserRepository userRepository) {
         this.bikeRepository = bikeRepository;
@@ -159,7 +159,7 @@ public class BikeController {
     /**
      * Ends a rental session.
      *
-     * @param session the session to be ended.
+     * @param session   the session to be ended.
      * @param timestamp current time in milliseconds since epoch.
      */
     private void endRentalSession(Session session, Long timestamp) {

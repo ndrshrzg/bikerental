@@ -14,7 +14,7 @@ public class ReturnResponse {
     @JsonProperty("session_duration_seconds")
     private Long sessionDuration;
 
-    public ReturnResponse(Session session, Long timestamp){
+    public ReturnResponse(Session session, Long timestamp) {
         this.message = "Successfully returned bike.";
         this.bikeId = session.getBikeId();
         this.sessionEnd = timestamp;
