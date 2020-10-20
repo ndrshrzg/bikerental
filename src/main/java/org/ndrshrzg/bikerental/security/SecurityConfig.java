@@ -1,7 +1,6 @@
 package org.ndrshrzg.bikerental.security;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.ndrshrzg.bikerental.auth.BikeRentalUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,6 +8,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -16,31 +16,28 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
-
-    private static final String USERROLE = "USER";
-
     @Autowired
     public void configureGlobalAuth(AuthenticationManagerBuilder authBuilder) throws Exception {
-        authBuilder
-                .inMemoryAuthentication()
-                .withUser("Hans")
-                .password(passwordEncoder()
-                        .encode("temp1234!")
-                ).roles(USERROLE);
+        authBuilder.userDetailsService(userDetailsServiceBean());
+
     }
 
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
-
-        httpSecurity.csrf().disable() // needs to be disabled for POST requests to work
+        httpSecurity
+                .csrf().disable() // needs to be disabled for POST requests to work
                 .antMatcher("/**")
                 .authorizeRequests()
-                .anyRequest().hasRole(USERROLE)
+                .anyRequest().authenticated() // allow all requests if authentication is successful
                 .and()
                 .httpBasic();
     }
 
+    @Override
+    @Bean
+    public UserDetailsService userDetailsServiceBean() {
+        return new BikeRentalUserDetailsService();
+    }
 
     @Bean
     PasswordEncoder passwordEncoder() {

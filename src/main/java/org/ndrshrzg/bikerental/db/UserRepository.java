@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    User findByName(String userName);
+    User findByUsername(String username);
 
     @Transactional
     @Query("select u.rented from User u where u.id = :userId")

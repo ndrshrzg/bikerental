@@ -36,9 +36,9 @@ public class BikeController {
     /**
      * Constructor to instantiate JpaRepository Beans.
      *
-     * @param bikeRepository
-     * @param sessionRepository
-     * @param userRepository
+     * @param bikeRepository JpaRepository handling Bikes
+     * @param sessionRepository JpaRepository handling Bikes
+     * @param userRepository JpaRepository handling Bikes
      */
     BikeController(BikeRepository bikeRepository, SessionRepository sessionRepository, UserRepository userRepository) {
         this.bikeRepository = bikeRepository;
@@ -50,7 +50,7 @@ public class BikeController {
      * Get all Bikes from database.
      *
      * @return List of Bike as JSON array sent to client.
-     * @throws JsonProcessingException
+     * @throws JsonProcessingException error mapping database object to JSON
      */
     @GetMapping(value = "/bikes", produces = MediaType.APPLICATION_JSON_VALUE)
     String getBikes() throws JsonProcessingException {
@@ -62,7 +62,7 @@ public class BikeController {
      *
      * @param bikeId Id of the Bike
      * @return Bike as JSON object sent to  client.
-     * @throws JsonProcessingException
+     * @throws JsonProcessingException error mapping database object to JSON
      */
     @GetMapping(value = "/bikes/{bikeId}", produces = MediaType.APPLICATION_JSON_VALUE)
     String getBikeByBikeId(@PathVariable Long bikeId) throws JsonProcessingException {
@@ -78,13 +78,13 @@ public class BikeController {
      * @return String message indicating success or error sent to the client.
      */
     @PostMapping(value = "/rent/{bikeId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    String rentBikeByBikeId(@PathVariable Long bikeId, HttpServletRequest request) {
+    String rentBikeByBikeId(@PathVariable Long bikeId, HttpServletRequest request) throws JsonProcessingException {
         // check if bike exists
         Bike bike = bikeRepository.findById(bikeId).orElseThrow(() -> new BikeNotFoundException(bikeId));
 
         String sessionId = request.getSession().getId();
         String userName = request.getRemoteUser();
-        User user = userRepository.findByName(userName);
+        User user = userRepository.findByUsername(userName);
 
         // User already has an active rental session
         if (userHasActiveSession(user.getId())) {
@@ -94,10 +94,13 @@ public class BikeController {
         if (!bike.isFree()) {
             throw new BikeAlreadyRentedException(bikeId);
         } else {
+            // instantiate session
+            Long sessionStart = System.currentTimeMillis();
+            Session newSession = new Session(sessionId, user.getId(), user.getUsername(), bike.getBikeId(), bike.getFrame(), sessionStart);
             // start new rental session
-            startRentalSession(sessionId, user, bike);
+            startRentalSession(newSession);
             // return OK response
-            return "{\"message\":\"OK\"}";
+            return om.writeValueAsString(new RentResponse(newSession));
         }
 
     }
@@ -110,30 +113,31 @@ public class BikeController {
      * @return String message indicating success or error sent to the client.
      */
     @PostMapping(value = "/return/{bikeId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    String returnBikeByBikeId(@PathVariable("bikeId") Long bikeId, HttpServletRequest request) {
+    String returnBikeByBikeId(@PathVariable("bikeId") Long bikeId, HttpServletRequest request) throws JsonProcessingException {
         // check if bike exists
         Bike bike = bikeRepository.findById(bikeId).orElseThrow(() -> new BikeNotFoundException(bikeId));
 
-        // User trying to return a bike that is already free
-        if (bike.isFree()) {
-            throw new BikeNotRentedException(bikeId);
-        }
-
         String userName = request.getRemoteUser();
-        User user = userRepository.findByName(userName);
+        User user = userRepository.findByUsername(userName);
 
         // User has no active rental session
         if (!userHasActiveSession(user.getId())) {
             throw new UserHasNoActiveSessionException(user.getId());
         } else {
-            Session activeSession = sessionRepository.findByUserIdAndSessionEndIsNull(user.getId());
-            Long sessionBikeId = activeSession.getBikeId();
-            // User trying to return a bike they did not rent
-            if (!sessionBikeId.equals(bikeId)) {
-                throw new BikeNotRentedByUserException(user.getId(), bikeId);
+            // User trying to return a bike that is already free
+            if (bike.isFree()) {
+                throw new BikeNotRentedException(bikeId);
             } else {
-                endRentalSession(activeSession);
-                return "{\"message\":\"OK\"}";
+                Session activeSession = sessionRepository.findByUserIdAndSessionEndIsNull(user.getId());
+                Long sessionBikeId = activeSession.getBikeId();
+                // User trying to return a bike they did not rent
+                if (!sessionBikeId.equals(bikeId)) {
+                    throw new BikeNotRentedByUserException(user.getId(), bikeId);
+                } else {
+                    Long timestamp = System.currentTimeMillis();
+                    endRentalSession(activeSession, timestamp);
+                    return om.writeValueAsString(new ReturnResponse(activeSession, timestamp));
+                }
             }
         }
     }
@@ -141,32 +145,31 @@ public class BikeController {
     /**
      * Starts a new rental session.
      *
-     * @param sessionId Unique Id for the session. Uses the Session Id generated by Spring Web for the request.
-     * @param user      User for which a session is started.
-     * @param bike      Bike that the User rented.
+     * @param session the session to be started.
      */
-    private void startRentalSession(String sessionId, User user, Bike bike) {
-        // add info to session
-        Long sessionStart = System.currentTimeMillis();
-        sessionRepository.save(new Session(sessionId, user.getId(), user.getName(), bike.getBikeId(), bike.getFrame(), sessionStart, null));
+    private void startRentalSession(Session session) {
+        // save new session
+        sessionRepository.save(session);
         // mark Bike as rented
-        bikeRepository.setBikeIsFree(bike.getBikeId(), false);
+        bikeRepository.setBikeIsFree(session.getBikeId(), false);
         // mark User to have rented
-        userRepository.setUserHasRented(user.getId(), true);
+        userRepository.setUserHasRented(session.getUserId(), true);
     }
 
     /**
      * Ends a rental session.
      *
-     * @param activeSession the session to be ended.
+     * @param session the session to be ended.
+     * @param timestamp current time in milliseconds since epoch.
      */
-    private void endRentalSession(Session activeSession) {
+    private void endRentalSession(Session session, Long timestamp) {
         // add timestamp to session end
-        sessionRepository.setSessionEnd(activeSession.getSessionId(), System.currentTimeMillis());
+        Long sessionDurationSeconds = (timestamp - session.getSessionStart()) / 1000L;
+        sessionRepository.setSessionEnd(session.getSessionId(), timestamp, sessionDurationSeconds);
         // mark bike as free
-        bikeRepository.setBikeIsFree(activeSession.getBikeId(), true);
+        bikeRepository.setBikeIsFree(session.getBikeId(), true);
         // mark User to have stopped renting
-        userRepository.setUserHasRented(activeSession.getUserId(), false);
+        userRepository.setUserHasRented(session.getUserId(), false);
     }
 
     /**

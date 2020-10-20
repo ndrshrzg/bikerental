@@ -20,18 +20,21 @@ public class Session {
 
     private Long sessionStart;
     private Long sessionEnd;
+    private Long sessionDurationSeconds;
 
-    public Session(String sessionId, Long userId, String userName, Long bikeId, String bikeFrame, Long sessionStart, Long sessionEnd) {
+    public Session(String sessionId, Long userId, String userName, Long bikeId, String bikeFrame, Long sessionStart) {
         this.sessionId = sessionId;
         this.userId = userId;
         this.userName = userName;
         this.bikeId = bikeId;
         this.bikeFrame = bikeFrame;
         this.sessionStart = sessionStart;
-        this.sessionEnd = sessionEnd;
+        this.sessionEnd = null;
+        this.sessionDurationSeconds = null;
     }
 
-    public Session() {}
+    public Session() {
+    }
 
     public void setSessionId(String sessionId) {
         this.sessionId = sessionId;
@@ -87,6 +90,14 @@ public class Session {
 
     public void setSessionEnd(Long sessionEnd) {
         this.sessionEnd = sessionEnd;
+    }
+
+    public Long getSessionDurationSeconds() {
+        return sessionDurationSeconds;
+    }
+
+    public void setSessionDurationSeconds(Long sessionDurationSeconds) {
+        this.sessionDurationSeconds = sessionDurationSeconds;
     }
 
     @Override

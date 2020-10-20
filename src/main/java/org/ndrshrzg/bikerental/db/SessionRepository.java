@@ -13,7 +13,7 @@ public interface SessionRepository extends JpaRepository<Session, Long> {
 
     @Modifying(clearAutomatically = true)
     @Transactional
-    @Query("update Session s set s.sessionEnd = :sessionEnd where s.sessionId = :sessionId")
-    void setSessionEnd(@Param("sessionId") String sessionId, @Param("sessionEnd") Long sessionEnd);
+    @Query("update Session s set s.sessionEnd = :sessionEnd, s.sessionDurationSeconds = :sessionDurationSeconds where s.sessionId = :sessionId")
+    void setSessionEnd(@Param("sessionId") String sessionId, @Param("sessionEnd") Long sessionEnd, @Param("sessionDurationSeconds") Long sessionDurationSeconds);
 
 }

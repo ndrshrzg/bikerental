@@ -11,7 +11,11 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    @Column(nullable = false, unique = true)
+    private String username;
+    private String password;
+
+
     private float latitude;
     private float longitude;
     private boolean rented;
@@ -19,8 +23,9 @@ public class User {
     public User() {
     }
 
-    public User(String name, float latitude, float longitude, boolean rented) {
-        this.name = name;
+    public User(String username, String password, float latitude, float longitude, boolean rented) {
+        this.username = username;
+        this.password = password;
         this.latitude = latitude;
         this.longitude = longitude;
         this.rented = rented;
@@ -34,12 +39,12 @@ public class User {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getUsername() {
+        return username;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setUsername(String name) {
+        this.username = name;
     }
 
     public float getLatitude() {
@@ -66,23 +71,35 @@ public class User {
         this.rented = rented;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public boolean isRented() {
+        return rented;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
         return id.equals(user.id) &&
-                name.equals(user.name);
+                username.equals(user.username);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name);
+        return Objects.hash(id, username);
     }
 
     @Override
     public String toString() {
-        return "{id=" + this.getId() + ",name=" + this.getName() + ",latitude=" + this.getLatitude() +
+        return "{id=" + this.getId() + ",name=" + this.getUsername() + ",latitude=" + this.getLatitude() +
                 ",longitude=" + this.getLongitude() + ",rented=" + this.hasRented() + "}";
     }
 }
