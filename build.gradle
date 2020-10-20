@@ -60,7 +60,7 @@ dockerCompose {
 }
 
 // custom task that builds java sources, docker image for Bikerental application and runs docker-compose
-task runBikeRental {
+task runBikerental {
     println("Executing tasks build, buildBikerentalImage and docker-compose up.")
     dependsOn('build')
     dependsOn('buildBikerentalImage')
