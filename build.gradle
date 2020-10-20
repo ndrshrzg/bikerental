@@ -28,8 +28,9 @@ dependencies {
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
-    // in memory db for unit tests
-    runtimeOnly 'com.h2database:h2'
+    // in memory db for quicker development when running spring application as standalone.
+    // change datasource and jpa.database configuration in application.properties accordingly.
+    //runtimeOnly 'com.h2database:h2'
 
     // test dependencies
     testRuntimeOnly 'com.h2database:h2'
@@ -41,6 +42,7 @@ dependencies {
 build {
 }
 
+// run unit tests and print test result to console
 test {
     useJUnitPlatform()
     afterTest { desc, result ->
@@ -49,7 +51,7 @@ test {
 }
 
 // build docker image. Tag as used in docker-compose.yml
-task buildBikerentalImage(type: DockerBuildImage) {
+task buildBikeRentalImage(type: DockerBuildImage) {
     inputDir = file('.')
     images.add('bikerental-image:latest')
 }
@@ -59,10 +61,11 @@ dockerCompose {
     useComposeFiles["docker-compose.yml"]
 }
 
-// custom task that builds java sources, docker image for Bikerental application and runs docker-compose
-task runBikerental {
-    println("Executing tasks build, buildBikerentalImage and docker-compose up.")
+// custom task that builds java sources, docker image for BikeRental application and runs docker-compose
+task runBikeRental {
+    println("Executing tasks clean, build, buildBikeRentalImage and docker-compose up.")
+    dependsOn('clean')
     dependsOn('build')
-    dependsOn('buildBikerentalImage')
+    dependsOn('buildBikeRentalImage')
     dependsOn('composeUp')
 }
