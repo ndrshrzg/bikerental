@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   description: This API allows you to retrieve and manage bicylce rentals.
-  version: 1.0.0
+  version: 1.1.0
   title: Bike Sharing API
 tags:
   - name: Scoring
@@ -10,89 +10,31 @@ paths:
     get:
       tags:
         - Bikes
-      summary: Returns a list of all bikes
+      summary: Receive a list of all bikes
       operationId: getAllBikes
-      parameters:
-        - $ref: "#/components/securitySchemes/api_key"
+      security:
+        - basicAuth: [ ]
       responses:
         "200":
-          description: Success
+          description: OK
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/BikeList"
         "400":
-          description: Bad Request Error
+          description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "502":
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-      security:
-        - api_key: []
-  /rent:
-    post:
-      tags:
-        - Rental
-      summary: Rent a bike by bike_id
-      operationId: rentBike
-      parameters:
-        - $ref: "#/components/securitySchemes/api_key"
-      responses:
-        "200":
-          description: Success
-        "400":
-          description: Bad Request Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        "409":
-          description: Conflict - User already has an active rental session
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        "500":
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-      security:
-        - api_key: []
-
-  /return:
-    post:
-      tags:
-        - Rental
-      summary: Provide a refund transaction to be processed by the billing
-      operationId: storeRefund
-      parameters:
-        - $ref: "#/components/securitySchemes/api_key"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ReturnResponse"
-        description: todo
-        required: true
-      responses:
-        "200":
-          description: Success
-        "400":
-          description: Bad Request Error
+        "401":
+          description: Unauthorized
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
         "404":
-          description: Not Found Error
+          description: Not Found
           content:
             application/json:
               schema:
@@ -103,37 +45,171 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-      security:
-        - api_key: []
 
-  /initialize:
-    post:
+  /bikes/{bikeId}:
+    get:
       tags:
-        - Demo
-      summary: Initialize data for demo purposes
-      operationId: init
+        - Bikes
+      summary: Receive info on a bike by bike_id
+      operationId: getBikeByBikeId
+      security:
+        - basicAuth: [ ]
+      parameters:
+        - name: bikeId
+          in: path
+          required: true
+          schema:
+            type: number
       responses:
         "200":
-          description: Initialized successfully
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Bike"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /rent/{bikeId}:
+    post:
+      tags:
+        - Rental
+      summary: Rent a bike by bike_id
+      operationId: rentBike
+      security:
+        - basicAuth: [ ]
+      parameters:
+        - name: bikeId
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RentResponse"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /return/{bikeId}:
+    post:
+      tags:
+        - Rental
+      summary: Return a bike by bike_id
+      operationId: storeRefund
+      security:
+        - basicAuth: [ ]
+      parameters:
+        - name: bikeId
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReturnResponse"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 
 
 servers:
-  - url: https://bikerent.ndrshrzg.com/
+  - url: http://localhost
+
+security:
+  - basicAuth: [ ]
+
 components:
   securitySchemes:
-    api_key:
-      type: apiKey
-      name: apiKey
-      in: header
+    basicAuth:
+      type: http
+      scheme: basic
 
   schemas:
     Bike:
       type: object
       properties:
         bike_id:
-          type: string
+          type: number
         frame:
           type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
         is_free:
           type: boolean
       required:
@@ -147,17 +223,23 @@ components:
     RentResponse:
       type: object
       properties:
-        bike_id:
+        message:
           type: string
-        timestamp:
+        bike_id:
+          type: number
+        at_timestamp_milliseconds:
           type: number
 
     ReturnResponse:
       type: object
       properties:
-        bike_id:
+        message:
           type: string
-        at:
+        bike_id:
+          type: number
+        at_timestamp_milliseconds:
+          type: number
+        session_duration_seconds:
           type: number
 
     ErrorResponse:
