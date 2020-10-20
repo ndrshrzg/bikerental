@@ -16,9 +16,9 @@ public class PreloadBikes {
     @Bean
     CommandLineRunner initBikes(BikeRepository repository) {
         return args -> {
-            logger.info("Adding Bike: " + repository.save(new Bike("Wilier Cento1Air", 0.1f, 0.2f, true)));
-            logger.info("Adding Bike: " + repository.save(new Bike("Specialized Tarmac SL7", 0.1f, 0.2f, true)));
-            logger.info("Adding Bike: " + repository.save(new Bike("Colnago C63", 0.1f, 0.2f, true)));
+            logger.info("Adding Bike: " + repository.save(new Bike("Wilier Cento1Air", 50.123506f, 8.542040f, true)));
+            logger.info("Adding Bike: " + repository.save(new Bike("Specialized Tarmac SL7", 50.119553f, 8.640179f, true)));
+            logger.info("Adding Bike: " + repository.save(new Bike("Colnago C63", 50.119664f, 8.650221f, true)));
         };
     }
 
