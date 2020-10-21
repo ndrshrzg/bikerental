@@ -52,7 +52,7 @@ test {
 
 // build docker image. Tag as used in docker-compose.yml
 task buildBikeRentalImage(type: DockerBuildImage) {
-    inputDir = file('.')
+    inputDir = projectDir
     images.add('bikerental-image:latest')
 }
 
